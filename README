@@ -1,0 +1,18 @@
+
+## Características
+
+- **Arquitectura limpia**: separación en `core` (lógica), `ui` (interfaz) y `main` (orquestación)
+- **Análisis automático**:
+  - Dimensiones del dataset (filas y columnas)
+  - Estadísticas descriptivas para columnas numéricricas: mínimo, máximo, desviación estándar, valores no nulos
+  - Balance de clases para variables categóricas (conteo y proporción por categoría)
+- **Interfaz por consola**: fácil de usar y extensible
+- **Entorno virtual incluido**: aislamiento de dependencias con `venv`
+
+## 📊 Ejemplo de uso
+
+Con el dataset `04_Empresas_Registro_de_Constancias_Jul-Sep2025.csv`:
+- Detecta 32 entidades (incluyendo CDMX y estados)
+- Calcula que la CDMX concentra el 26.1% de las constancias
+- Muestra desviación estándar nacional de participación: ~4.94
+

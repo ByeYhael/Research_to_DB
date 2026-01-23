@@ -1,22 +1,20 @@
 # data_loader.py
 import pandas as pd
-import os
 
 def cargar_dataset(ruta_archivo):
-    """
-    Carga un archivo CSV en un DataFrame.
-    """
-    # Verificar si el archivo existe
-    if not os.path.exists(ruta_archivo):
+    if not pd.io.common.file_exists(ruta_archivo):
         raise FileNotFoundError("El archivo no fue encontrado")
-
-    # Cargar usando pandas
+    
     try:
-        dataset = pd.read_csv(ruta_archivo)
+        # Aquí -999.0 es NaN
+        dataset = pd.read_csv(
+            ruta_archivo,
+            na_values=[-999.0, -888.0, "-999.0", "-888"],  # maneja varios formatos
+            keep_default_na=True
+        )
     except Exception as e:
         raise ValueError(f"Error al leer el CSV: {e}")
 
-    # Verificar si el dataset está vacío
     if dataset.empty:
         raise ValueError("El archivo está vacío")
 

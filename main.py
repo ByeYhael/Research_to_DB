@@ -12,7 +12,8 @@ def main():
         dataset = data_loader.cargar_dataset(ruta_archivo)
         
         # 3. Solicitar configuración adicional (variable objetivo)
-        columna_target = console.solicitar_columna_objetivo("target")
+        #columna_target = console.solicitar_columna_objetivo("target")
+        columna_target = "grupo"
         
         # 4. Realizar análisis (Lógica de Negocio)
         dimensiones = analyzer.obtener_dimensiones(dataset)

@@ -25,11 +25,11 @@ def mostrar_estadisticas_numericas(stats_numericas):
         print(f"  Mínimo: {stats['min']}")
         print(f"  Máximo: {stats['max']}")
         std_val = stats['std']
-    if std_val is not None and str(std_val).lower() != 'nan':
-        print(f"  Desviación estándar: {std_val:.4f}")
-    else:
-        print("  Desviación estándar: N/A")
-        print(f"  Valores no nulos: {stats['no_nulos']}")
+        if std_val is not None and str(std_val).lower() != 'nan':
+            print(f"  Desviación estándar: {std_val:.4f}")
+        else:
+            print("  Desviación estándar: N/A")
+            print(f"  Valores no nulos: {stats['no_nulos']}")
 
 def mostrar_balance_clases(balance_clases):
     print("\n=== BALANCE DE CLASES ===")
