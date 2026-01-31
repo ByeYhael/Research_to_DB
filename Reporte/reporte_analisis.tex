@@ -1,0 +1,166 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{caption}
+\usepackage{lipsum} % Solo para rellenar espacio; elimínalo en tu versión final
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=blue,
+	urlcolor=cyan,
+}
+
+\geometry{a4paper, margin=2.5cm}
+\onehalfspacing
+\titleformat{\section}{\large\bfseries\centering}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{}
+
+\title{Análisis Exploratorio de Pobreza Multidimensional en México \\ \large Aplicación Modular en Python para Análisis de Base de datos y Tipo de Variables}
+\author{Yhael Salvador Perez Balderas \\ Universidad Autónoma de Querétaro}
+\date{\today}
+
+\begin{document}
+	
+	\maketitle
+	
+	\section{Introducción}
+	Este reporte presenta una aplicación modular desarrollada en Python para analizar un dataset del Instituto Nacional de Estadística y Geografía (INEGI) sobre pobreza multidimensional en México, desglosado por sexo. El objetivo es demostrar cómo una arquitectura de software bien diseñada facilita la identificación de características relevantes, la detección de valores atípicos y el balance de clases.
+	
+	\section{Marco Teórico}
+	\subsection{Tipos de datos en Aprendizaje Automático}
+	Los datos utilizados en este análisis son \textbf{estructurados y tabulares}, caracterizados por observaciones (filas) y variables (columnas).A diferencia de datos no estructurados (imágenes, texto), los datos tabulares permiten un análisis estadístico directo.
+	
+	\subsection{Variables confusoras}
+	En el contexto de este dataset, es relevante identificar dos tipos de variables problemáticas:
+	\begin{itemize}
+		\item \textbf{Variables confusoras}: Factores que influyen simultáneamente en la variable independiente y la dependiente, generando correlaciones espúreas. En este caso, el \texttt{sexo} podría actuar como variable confusora si se estudia la relación entre pobreza y acceso a servicios sin controlar por género.
+		\item \textbf{Variables filtrantes (leaky)}: Características que contienen información comprometida con la geografía. Por ejemplo, \texttt{clave\_entidad} podría ser leaky si se usa para predecir pobreza en nuevas localidades, ya que el modelo podría aprender patrones específicos de entidades conocidas en lugar de reglas generales.
+	
+	\end{itemize}
+
+	
+	\section{Materiales y Métodos}
+	\subsection{Dataset analizado}
+	Se utilizó el archivo \texttt{pobreza\_grupos\_poblacionales\_sexo.csv} del INEGI, que contiene información a nivel de localidad sobre indicadores de pobreza multidimensional. Cada localidad aparece \textbf{dos veces} en el dataset: una para la población femenina y otra para la masculina. Esto permite comparar cómo las condiciones de pobreza afectan a ambos géneros dentro del mismo contexto geográfico.
+	
+	\begin{table}[h]
+		\centering
+		\caption{Estructura del dataset}
+		\label{tab:estructura}
+		\begin{tabular}{>{\raggedright\arraybackslash}p{4cm} >{\raggedright\arraybackslash}p{10cm}}
+			\toprule
+			\textbf{Tipo de variable} & \textbf{Ejemplos en el dataset} \\
+			\midrule
+			Identificadores geográficos & \texttt{clave\_entidad}, \texttt{clave\_municipio} \\
+			Demográficas & \texttt{poblacion}, \texttt{grupo} (sexo) \\
+			Indicadores de pobreza & \texttt{pobreza\_porcentaje}, \texttt{carencia\_rezago\_educativo\_porcentaje}, \texttt{ingreso\_inferior\_a\_lpi\_porcentaje} \\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+	
+	El dataset original contiene 14,764 registros (7,382 localidades $\times$ 2 sexos) y 17 atributos. Los valores faltantes están codificados como \texttt{-999.0} y fueron convertidos a \texttt{NaN} durante la carga.
+	
+	\subsection{Arquitectura de la aplicación}
+	La aplicación sigue el principio de \textbf{separación de responsabilidades}, organizada en tres módulos:
+	
+	\begin{itemize}
+		\item \textbf{\texttt{core/}}: Contiene la lógica de negocio.
+		\begin{itemize}
+			\item \texttt{data\_loader.py}: Carga el CSV y gestiona valores faltantes mediante \texttt{na\_values=[-999.0]} en \texttt{pandas.read\_csv()}.
+			\item \texttt{analyzer.py}: Calcula estadísticas descriptivas (mínimo, máximo, desviación estándar) y balance de clases.
+		\end{itemize}
+		
+		\item \textbf{\texttt{ui/}}: Gestiona la interacción con el usuario.
+		\begin{itemize}
+			\item \texttt{console.py}: Solicita rutas y muestra resultados en consola.
+			\item \texttt{visualizer.py}: Genera histogramas comparativos por sexo.
+		\end{itemize}
+		
+		\item \textbf{\texttt{main.py}}: Orquesta el flujo completo:
+		\begin{enumerate}
+			\item Solicita la ruta del archivo CSV al usuario.
+			\item Carga y preprocesa los datos (extracción de sexo desde \texttt{grupo}).
+			\item Ejecuta análisis estadísticos.
+			\item Muestra resultados y genera visualizaciones.
+		\end{enumerate}
+	\end{itemize}
+	
+	
+	\section{Resultados y Discusión}
+	\subsection{Resumen estadístico}
+	El análisis arrojó los siguientes resultados clave:
+	
+	\begin{table}[h]
+		\centering
+		\caption{Estadísticas descriptivas de variables seleccionadas}
+		\label{tab:estadisticas}
+		\begin{tabular}{lrrr}
+			\toprule
+			\textbf{Variable} & \textbf{Mínimo} & \textbf{Máximo} & \textbf{Desv. Estándar} \\
+			\midrule
+			Población & 38.0 & 999,227.0 & 71,284.09 \\
+			Pobreza (\%) & 3.33 & 99.95 & 20.76 \\
+			Rezago educativo (\%) & 1.74 & 67.70 & 10.76 \\
+			Servicios básicos (\%) & 0.48 & 100.00 & 29.10 \\
+			Ingreso inferior a LPI (\%) & 4.45 & 99.95 & 18.53 \\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+	
+	\begin{itemize}
+		\item La \textbf{población} presenta alta variabilidad (desv. estándar: 71,284), reflejando la coexistencia de localidades rurales pequeñas y zonas urbanas densas.
+		\item El rango de \textbf{pobreza} (3.33\%--99.95\%) evidencia una distribución heterogénea: algunas localidades tienen mínima incidencia de pobreza, mientras que otras presentan casi totalidad de su población en condición de pobreza.
+		\item La \textbf{desviación estándar más alta} corresponde a \textit{servicios básicos} (29.10), indicando gran disparidad en el acceso a agua potable, drenaje y electricidad entre localidades.
+	\end{itemize}
+	
+	\subsection{Balance de clases}
+	El dataset muestra un balance perfecto entre géneros:
+	\begin{itemize}
+		\item Hombres: 7,382 registros (50.00\%)
+		\item Mujeres: 7,382 registros (50.00\%)
+	\end{itemize}
+	Este equilibrio valida la estructura del dataset (doble registro por localidad) y elimina sesgos muestrales en análisis comparativos por sexo.
+	
+	\subsection{Visualización: Histogramas por sexo}
+	La Figura~\ref{fig:histogramas} muestra la distribución de indicadores clave separados por sexo. Los histogramas revelan:
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=\textwidth]{Histogramas.png}
+		\caption{Distribución de indicadores de pobreza por sexo. Azul: hombres; Rosa: mujeres.}
+		\label{fig:histogramas}
+	\end{figure}
+	
+	\begin{itemize}
+		\item \textbf{Distribuciones similares}: Para la mayoría de indicadores (pobreza, rezago educativo), las curvas de hombres y mujeres son casi idénticas, sugiriendo que la pobreza afecta a ambos géneros de manera comparable a nivel agregado.
+		\item \textbf{Simetría en ingresos}: La distribución de \textit{ingreso inferior a LPI} es prácticamente idéntica para ambos sexos, reflejando que la pobreza extrema por ingreso no discrimina por género a nivel municipal.
+	\end{itemize}
+	
+	Estos hallazgos son valiosos para el diseño de políticas públicas con enfoque de género, ya que identifican dimensiones específicas donde las mujeres podrían requerir atención prioritaria.
+	
+	\section{Conclusión}
+	La aplicación desarrollada demuestra cómo una arquitectura modular en Python facilita el análisis exploratorio de datos estructurados, paso previo indispensable en cualquier proyecto de Aprendizaje Automático. Los resultados obtenidos del dataset del INEGI revelan:
+	
+	\begin{itemize}
+		\item Una distribución heterogénea de la pobreza multidimensional en México, con localidades que van desde mínima incidencia hasta casi totalidad de su población en condición de pobreza.
+		\item Similitudes generales entre géneros en la mayoría de indicadores, pero diferencias sutiles en dimensiones específicas como servicios básicos.
+		\item La importancia de identificar variables confusoras (sexo) y filtrantes (clave\_entidad) antes de entrenar modelos predictivos.
+	\end{itemize}
+	
+	Se podrían predecir niveles de pobreza a partir de características demográficas y geográficas, siempre evitando el uso de variables filtrantes para garantizar la generalización del modelo.
+	
+	\section{Bibliografía}
+	\begin{enumerate}
+		
+		\item INEGI. (2023). \textit{Microdatos de pobreza multidimensional}. 
+		
+		\item CONEVAL. (2022). \textit{Guía para la medición de la pobreza multidimensional en México}. Ciudad de México.
+	\end{enumerate}
+	
+\end{document}

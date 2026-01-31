@@ -1,18 +1,29 @@
+# Analizador de Pobreza Multidimensional (INEGI)
 
-## Características
+Aplicación modular en Python para análisis exploratorio de datos del INEGI sobre pobreza multidimensional por sexo.
 
-- **Arquitectura limpia**: separación en `core` (lógica), `ui` (interfaz) y `main` (orquestación)
-- **Análisis automático**:
-  - Dimensiones del dataset (filas y columnas)
-  - Estadísticas descriptivas para columnas numéricricas: mínimo, máximo, desviación estándar, valores no nulos
-  - Balance de clases para variables categóricas (conteo y proporción por categoría)
-- **Interfaz por consola**: fácil de usar y extensible
-- **Entorno virtual incluido**: aislamiento de dependencias con `venv`
+## 📁 Estructura del proyecto
+Research_to_DB/
+├── main.py # Punto de entrada
+├── core/
+│ ├── init.py
+│ ├── data_loader.py # Carga y preprocesamiento de datos
+│ └── analyzer.py # Cálculo de estadísticas y balance de clases
+├── ui/
+│ ├── init.py
+│ ├── console.py # Interfaz de consola
+│ └── visualizer.py # Generación de histogramas
+├── Reporte/
+│ ├── reporte.tex # Reporte en LaTeX 
+│ ├── reporte_analisis.pdf # Reporte en PDF
+│ └── Histogramas.png # Visualizaciones por sexo
 
-## 📊 Ejemplo de uso
 
-Con el dataset `04_Empresas_Registro_de_Constancias_Jul-Sep2025.csv`:
-- Detecta 32 entidades (incluyendo CDMX y estados)
-- Calcula que la CDMX concentra el 26.1% de las constancias
-- Muestra desviación estándar nacional de participación: ~4.94
+## ⚙️ Dependencias
 
+```bash
+pip install pandas matplotlib
+
+python main.py  
+
+#Introducir nombre del archivo= Research_to_DB\pobreza_grupos_poblacionales_sexo.csv

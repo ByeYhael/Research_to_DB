@@ -1,15 +1,15 @@
-# data_loader.py
+# core/data_loader.py
 import pandas as pd
+import os
 
 def cargar_dataset(ruta_archivo):
-    if not pd.io.common.file_exists(ruta_archivo):
+    if not os.path.exists(ruta_archivo):
         raise FileNotFoundError("El archivo no fue encontrado")
-    
+
     try:
-        # Aquí -999.0 es NaN
         dataset = pd.read_csv(
             ruta_archivo,
-            na_values=[-999.0, -888.0, "-999.0", "-888"],  # maneja varios formatos
+            na_values=[-999.0, -888.0, "-999.0", "-888", "ND"],  # <-- clave
             keep_default_na=True
         )
     except Exception as e:
